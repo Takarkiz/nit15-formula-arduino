@@ -2,8 +2,6 @@
 /*ヘッダーファイルの追加(ミリ秒単位でしてするタイマー)
 loop関数を実行中にも周期的に割り込みで実行することができる
 */
-//アナログ入力の数を定義
-#define NUM 4
 
 int rev_cnt; //rpmに関する電流
 int rev; //rpm自体の値
@@ -15,16 +13,22 @@ int voltInt;
 int rpmInt;
 int waterInt;
 int passSequence = 0;
+int shiftCheck = 0;
 
 /*passSequenceを求める
 passSequence = 
 */
 
 void setup(){
-    Serial.begin(9600);
+    Serial.begin(115200);
     MsTimer2::set(250,flash);   //250msごとにflashを実行
     MsTimer2::start();
 
+  //ピンモードを設定  
+  for(int i = 2;i < 11;i++){
+    pinMode(i,OUTPUT);
+    digitalWrite(i,LOW);
+  }
 /*
 analogReadに関しては
 A2...rmp..1
@@ -100,13 +104,6 @@ void loop(){
     //volt
     Serial.write(voltInt);
     delay(50);
-    
-
-//    
-//   // Serial.write(19);
-
-
-    
 }
 
 void flash(){
@@ -121,34 +118,40 @@ void flash(){
     
     //rpmの値からシフトするレベルの値を割りあてる
     if (rev > 10500){
-        rpmInt = 9;
+        lightupLED(10);
     }else if (rev > 10000){
-        rpmInt = 8;
+        lightupLED(9);
     }else if (rev > 9500){
-        rpmInt = 7;
+        lightupLED(8);
     }else if (rev > 9000){
-        rpmInt = 6;
+        lightupLED(7);
     }else if (rev > 8000){
-        rpmInt = 5;
+        lightupLED(6);
     }else if (rev > 7000){
-        rpmInt = 4;
+        lightupLED(5);
     }else if (rev > 6000){
-        rpmInt = 3;
+        lightupLED(4);
     }else if (rev > 5000){
-        rpmInt = 2;
+        lightupLED(3);
     }else if (rev > 4000){
-        rpmInt = 1;
+        lightupLED(2);
     }else {
-        rpmInt = 0;
+        
     }
-    
-    //渡す用の値
-    //rpmInt = (int)rev;
-    
-    
-    //シリアルにrevの値を表示
-    //Serial.println(rev);
-    
+
+}
+
+void lightupLED(int num){
+
+  int j = 2;
+  for(j;j <= num;j++){
+    digitalWrite(j,HIGH);
+  }
+  if (j != 11){
+    for(j;j <= 1; j++){
+      digitalWrite(j,LOW);
+    }
+  }
 }
 
 
